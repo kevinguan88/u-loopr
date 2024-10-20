@@ -9,6 +9,27 @@ export default function Home() {
   const [endTime, setEndTime] = useState(0);
   const playerRef = useRef(null);
 
+  const handleStartTimeChange = (e) => {
+    setStartTime(e.textContent);
+  };
+
+  const handleEndTimeChange = (e) => {
+    setEndTime(e.textContent);
+  };
+
+  const handleLoop = () => {
+    if (startTime && endTime) {
+      if (startTime >= endTime) {
+        alert("Start time should be less than end time.");
+        return;
+      }
+      const player = playerRef.current;
+      if ((player.getCurrentTime() >= endTime) || (player.getCurrentTime() < startTime)) {
+        player.seekTo(startTime);
+      }
+    }
+  };
+
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
       <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
@@ -24,8 +45,8 @@ export default function Home() {
         </ol>
         <YouTube videoId="DSBBEDAGOTc" />
         <div> 
-          <input></input>
-          <input></input>
+          <input onChange={handleStartTimeChange}/>
+          <input onChange={handleEndTimeChange}/>
         </div>
 
         <div className="flex gap-4 items-center flex-col sm:flex-row">

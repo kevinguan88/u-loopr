@@ -2,6 +2,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Image from "next/image";
 import YouTube from 'react-youtube';
+import { timeToSeconds } from './utils/timeToSeconds.js';
 
 export default function Home() {
 

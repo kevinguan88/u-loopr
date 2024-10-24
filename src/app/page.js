@@ -1,13 +1,14 @@
 "use client";
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Image from "next/image";
 import YouTube from 'react-youtube';
 
 export default function Home() {
 
   const [startTime, setStartTime] = useState(0);
-  const [endTime, setEndTime] = useState(0);
+  const [endTime, setEndTime] = useState(5);
   const playerRef = useRef(null);
+  const intervalRef = useRef(null);
 
   const handleStartTimeChange = (e) => {
     setStartTime(e.textContent);
@@ -18,6 +19,9 @@ export default function Home() {
   };
 
   const handleLoop = () => {
+    console.log("handle loop");
+    console.log(startTime, endTime);
+    console.log(playerRef.current.getCurrentTime());
     if (startTime && endTime) {
       if (startTime >= endTime) {
         alert("Start time should be less than end time.");
@@ -29,6 +33,19 @@ export default function Home() {
       }
     }
   };
+
+  const handlePlayerStateChange = (e) => {
+    const player = e.target;
+    if (player.getPlayerState() === 1) {
+      intervalRef.current = setInterval(handleLoop, 200);
+    } else {
+      clearInterval(intervalRef.current);
+    }
+  };
+
+  useEffect(() => {
+    return () => clearInterval(intervalRef.current); // Clear interval on component unmount
+  }, []);
 
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
@@ -43,7 +60,11 @@ export default function Home() {
           </li>
           <li>Specify the section you want to loop.</li>
         </ol>
-        <YouTube videoId="DSBBEDAGOTc" />
+        <YouTube 
+          videoId="DSBBEDAGOTc" 
+          onReady={(e) => playerRef.current = e.target}
+          onStateChange={handlePlayerStateChange}
+        />
         <div> 
           <input onChange={handleStartTimeChange}/>
           <input onChange={handleEndTimeChange}/>

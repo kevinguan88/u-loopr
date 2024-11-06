@@ -8,6 +8,7 @@ export default function Home() {
 
   const [startTime, setStartTime] = useState(0);
   const [endTime, setEndTime] = useState(5);
+  const [currentTime, setCurrentTime] = useState(0);
   const playerRef = useRef(null);
   const intervalRef = useRef(null);
 
@@ -19,26 +20,34 @@ export default function Home() {
     setEndTime(e.textContent);
   };
 
-  const handleLoop = () => {
-    console.log("handle loop");
-    console.log(startTime, endTime);
-    console.log(playerRef.current.getCurrentTime());
-    if (startTime && endTime) {
+  useEffect(() => {
+    console.log(currentTime);
+    if ((startTime >= 0) && endTime) {
+      console.log('start and end time are set');
       if (startTime >= endTime) {
         alert("Start time should be less than end time.");
         return;
       }
       const player = playerRef.current;
-      if ((player.getCurrentTime() >= endTime) || (player.getCurrentTime() < startTime)) {
+      if ((currentTime >= endTime) || (currentTime < startTime)) {
+        console.log("seeking to " + startTime);
         player.seekTo(startTime);
       }
     }
+  }, [currentTime]);
+
+  const handleLoop = () => {
+    console.log("handle loop");
+    console.log(startTime + "," + endTime);
+    console.log(playerRef.current.getCurrentTime());
+    setCurrentTime(Math.floor(playerRef.current.getCurrentTime()));
+    
   };
 
   const handlePlayerStateChange = (e) => {
     const player = e.target;
     if (player.getPlayerState() === 1) {
-      intervalRef.current = setInterval(handleLoop, 200);
+      intervalRef.current = setInterval(handleLoop, 100);
     } else {
       clearInterval(intervalRef.current);
     }

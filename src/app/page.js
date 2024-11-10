@@ -6,43 +6,49 @@ import { timeToSeconds } from './utils/timeToSeconds.js';
 
 export default function Home() {
 
-  const [startTime, setStartTime] = useState(0);
+  const [startTime, setStartTime] = useState(5);
   const [endTime, setEndTime] = useState(10);
   const [currentTime, setCurrentTime] = useState(0);
   const playerRef = useRef(null);
   const intervalRef = useRef(null);
 
   const handleStartTimeChange = (e) => {
-    setStartTime(e.textContent);
+    console.log(e.target.value);
+    setStartTime(e.target.value);
   };
 
   const handleEndTimeChange = (e) => {
-    setEndTime(e.textContent);
+    console.log(e.target.value);
+    setEndTime(e.target.value);
   };
 
   //handles the loop as the current time changes
   useEffect(() => {
-    console.log(currentTime);
-    if ((startTime >= 0) && endTime) {
-      console.log('start and end time are set');
-      if (startTime >= endTime) {
-        alert("Start time should be less than end time.");
-        return;
-      }
+    // if the player is ready
+    if (playerRef.current) {
       const player = playerRef.current;
-      if ((currentTime >= endTime) || (currentTime < startTime)) {
-        console.log("seeking to " + startTime);
-        player.seekTo(startTime);
+      console.log(currentTime);
+      if ((startTime >= 0) && endTime) {
+        console.log('start and end time are set');
+        if (startTime >= endTime) {
+          alert("Start time should be less than end time.");
+          setStartTime(0);
+          setEndTime(player.getDuration());
+          return;
+        }
+        // seeks to start time when current time is outside of loop range
+        if ((currentTime >= endTime) || (currentTime < startTime)) {
+          console.log("seeking to " + startTime);
+          player.seekTo(startTime);
+        }
       }
     }
   }, [currentTime]);
 
   const handleLoop = () => {
     console.log("handle loop");
-    console.log(startTime + "," + endTime);
-    console.log(playerRef.current.getCurrentTime());
     setCurrentTime(Math.floor(playerRef.current.getCurrentTime()));
-    
+
   };
 
   const handlePlayerStateChange = (e) => {
@@ -71,14 +77,14 @@ export default function Home() {
           </li>
           <li>Specify the section you want to loop.</li>
         </ol>
-        <YouTube 
-          videoId="DSBBEDAGOTc" 
+        <YouTube
+          videoId="DSBBEDAGOTc"
           onReady={(e) => playerRef.current = e.target}
           onStateChange={handlePlayerStateChange}
         />
-        <div> 
-          <input onChange={handleStartTimeChange}/>
-          <input onChange={handleEndTimeChange}/>
+        <div>
+          <input onChange={handleStartTimeChange} className='text-black'/>
+          <input onChange={handleEndTimeChange} className='text-black'/>
         </div>
 
         <div className="flex gap-4 items-center flex-col sm:flex-row">

@@ -7,7 +7,7 @@ import { timeToSeconds } from './utils/timeToSeconds.js';
 export default function Home() {
 
   const [startTime, setStartTime] = useState(0);
-  const [endTime, setEndTime] = useState(5);
+  const [endTime, setEndTime] = useState(10);
   const [currentTime, setCurrentTime] = useState(0);
   const playerRef = useRef(null);
   const intervalRef = useRef(null);
@@ -20,6 +20,7 @@ export default function Home() {
     setEndTime(e.textContent);
   };
 
+  //handles the loop as the current time changes
   useEffect(() => {
     console.log(currentTime);
     if ((startTime >= 0) && endTime) {

@@ -3,23 +3,55 @@ import React, { useState, useRef, useEffect } from 'react';
 import Image from "next/image";
 import YouTube from 'react-youtube';
 import { timeToSeconds } from './utils/timeToSeconds.js';
+import { secondsToTimeStamp } from './utils/secondsToTimeStamp.js';
 
 export default function Home() {
 
-  const [startTime, setStartTime] = useState(5);
-  const [endTime, setEndTime] = useState(10);
+  const [startTime, setStartTime] = useState(0);
+  const [endTime, setEndTime] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
   const playerRef = useRef(null);
   const intervalRef = useRef(null);
+  const startInput = useRef(null);
+  const endInput = useRef(null);
 
   const handleStartTimeChange = (e) => {
-    console.log(e.target.value);
-    setStartTime(e.target.value);
+    const timeStamp = e.target.value;
+    const time = timeStampToSeconds(timeStamp);
+    console.log('start time is: ' + time);
+    setStartTime(time);
   };
 
   const handleEndTimeChange = (e) => {
-    console.log(e.target.value);
-    setEndTime(e.target.value);
+    const timeStamp = e.target.value;
+    const time = timeStampToSeconds(timeStamp);
+    console.log('end time is: ' + time);
+    setEndTime(time);
+  };
+
+  //converts string of timestamp to seconds
+  const timeStampToSeconds = (timeStamp) => {
+    console.log(timeStamp);
+    const timeStampArray = timeStamp.split(':');
+    console.log('timestamp array: ' + timeStampArray);
+    switch (timeStampArray.length) {
+      case 1:
+        return timeToSeconds(0, 0, timeStampArray[0]);
+      case 2:
+        return timeToSeconds(0, timeStampArray[0], timeStampArray[1]);
+      case 3:
+        return timeToSeconds(timeStampArray[0], timeStampArray[1], timeStampArray[2]);
+    }
+  };
+
+  const resetLoop = () => {
+    if (playerRef.current) {
+      setStartTime(0);
+      startInput.current.value = "00:00:00";
+      setEndTime(playerRef.current.getDuration());
+      endInput.current.value = secondsToTimeStamp(playerRef.current.getDuration());
+    }
   };
 
   //handles the loop as the current time changes
@@ -30,10 +62,12 @@ export default function Home() {
       console.log(currentTime);
       if ((startTime >= 0) && endTime) {
         console.log('start and end time are set');
+        console.log('start time: ' + startTime + ' end time: ' + endTime);
         if (startTime >= endTime) {
+          //TODO: eventually change this to setting time to previous time
+          console.log("Start time should be less than end time.");
           alert("Start time should be less than end time.");
-          setStartTime(0);
-          setEndTime(player.getDuration());
+          resetLoop();
           return;
         }
         // seeks to start time when current time is outside of loop range
@@ -61,8 +95,16 @@ export default function Home() {
   };
 
   useEffect(() => {
-    return () => clearInterval(intervalRef.current); // Clear interval on component unmount
+    clearInterval(intervalRef.current); // Clear interval on component unmount
   }, []);
+
+
+  //TODO: set default end time to the duration of the video
+  useEffect(() => { 
+    if (playerRef.current) {
+      endInput.current.value = timeToSeconds(0, 0, playerRef.current.getDuration());
+    }
+  }, [endInput])
 
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
@@ -79,12 +121,15 @@ export default function Home() {
         </ol>
         <YouTube
           videoId="DSBBEDAGOTc"
-          onReady={(e) => playerRef.current = e.target}
+          onReady={(e) => {
+            playerRef.current = e.target;
+            resetLoop();
+          }}
           onStateChange={handlePlayerStateChange}
         />
-        <div>
-          <input onChange={handleStartTimeChange} className='text-black'/>
-          <input onChange={handleEndTimeChange} className='text-black'/>
+        <div className='w-full flex justify-between'>
+          <input onBlur={handleStartTimeChange} className='text-black text-center w-24' ref={startInput}/>
+          <input onBlur={handleEndTimeChange} className='text-black text-center w-24' ref={endInput} />
         </div>
 
         <div className="flex gap-4 items-center flex-col sm:flex-row">

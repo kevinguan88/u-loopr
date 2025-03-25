@@ -6,6 +6,7 @@ import { timeToSeconds } from './utils/timeToSeconds.js';
 import { secondsToTimeStamp } from './utils/secondsToTimeStamp.js';
 import ReactSlider from 'react-slider'
 import styled from 'styled-components';
+import supabase from './config/supabaseClient.js';
 
 const StyledSlider = styled(ReactSlider)`
   width: 618px;
@@ -30,7 +31,6 @@ const StyledTrack = styled.div`
 `;
 
 export default function Home() {
-
   const [startTime, setStartTime] = useState(0);
   const [endTime, setEndTime] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);

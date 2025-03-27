@@ -45,6 +45,7 @@ export default function Home() {
   const [fetchError, setFetchError] = useState(null);
   const [playlist, setPlaylist] = useState(null);
 
+  //fetches playlist
   useEffect(() => {
     const fetchPlaylist = async () => {
       const { data, error } = await supabase

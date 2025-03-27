@@ -42,6 +42,29 @@ export default function Home() {
   const startInput = useRef(null);
   const endInput = useRef(null);
 
+  const [fetchError, setFetchError] = useState(null);
+  const [playlist, setPlaylist] = useState(null);
+
+  useEffect(() => {
+    const fetchPlaylist = async () => {
+      const { data, error } = await supabase
+        .from('playlist')
+        .select('*');
+      if (error) {
+        setFetchError(error);
+        setPlaylist(null);
+        console.log("Error fetching playlist", error);
+      } 
+      if (data) {
+        setPlaylist(data);
+        setFetchError(null);
+        console.log("Successfully fetched playlist", data);
+      }
+    };
+
+    fetchPlaylist();
+  }, []);
+
   const handleStartTimeChange = (e) => {
     const timeStamp = e.target.value;
     const time = timeStampToSeconds(timeStamp);
@@ -174,6 +197,16 @@ const handleEndSliderChange = (value) => {
         </div>
         <div className="text-xl font-[family-name:var(--font-geist-mono)]">
           <h1 text-xl>U-Loopr</h1>
+        </div>
+        <div>
+          {fetchError && <p>{fetchError}</p>}
+          {playlist && (
+            <div>
+              {playlist.map((video) => (
+                <p>{video.video_id}</p>
+              ))}
+            </div>
+          )}
         </div>
         <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
           <li className="mb-2">

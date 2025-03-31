@@ -1,27 +1,33 @@
+"use client";
 import React, { useState } from 'react';
+import Link from 'next/link';
+import supabase from '../../config/supabaseClient.js';
+import { useRouter } from 'next/navigation';
 
-const LoginPage = () => {
-  const [username, setUsername] = useState('');
+const Login = () => {
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     setIsLoading(true);
     try {
       // Call API to authenticate user
-      const response = await fetch('/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password }),
+      let { data, error } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: password
       });
-      const data = await response.json();
-      if (data.success) {
-        // Login successful, redirect to dashboard or next page
-        window.location.href = '/dashboard';
+      if (error) {
+        setError(error);
+        console.log('error logging in');
+        console.log(error);
       } else {
-        setError(data.error);
+        // Login successful, redirect to dashboard or next page
+        console.log('successful login');
+        router.push('/');
       }
     } catch (error) {
       setError('An error occurred during login');
@@ -35,11 +41,11 @@ const LoginPage = () => {
       <h1>Login</h1>
       <form onSubmit={handleSubmit}>
         <label>
-          Username:
+          Email:
           <input
             type="text"
-            value={username}
-            onChange={(event) => setUsername(event.target.value)}
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
           />
         </label>
         <br />
@@ -55,10 +61,10 @@ const LoginPage = () => {
         <button type="submit" disabled={isLoading}>
           {isLoading ? 'Logging in...' : 'Login'}
         </button>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
+        {error && <p style={{ color: 'red' }}>{error.message}</p>}
       </form>
     </div>
   );
 };
 
-export default LoginPage;
+export default Login;

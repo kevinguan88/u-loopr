@@ -6,7 +6,8 @@ import { timeToSeconds } from './utils/timeToSeconds.js';
 import { secondsToTimeStamp } from './utils/secondsToTimeStamp.js';
 import ReactSlider from 'react-slider'
 import styled from 'styled-components';
-import supabase from './config/supabaseClient.js';
+import supabase from '../config/supabaseClient.js';
+import Link from 'next/link';
 
 const StyledSlider = styled(ReactSlider)`
   width: 618px;
@@ -210,8 +211,12 @@ const handleEndSliderChange = (value) => {
       <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
         <div className='flex flex-row-reverse w-full items-center gap-4'>
           <nav className="flex items-center gap-4">
-            <button className="text-sm text-center text-white px-2 py-1 rounded bg-neutral-950 transition-colors hover:bg-neutral-800">Sign Up</button>
-            <button className="text-sm text-center text-white px-2 py-1 rounded bg-neutral-950 transition-colors hover:bg-neutral-800">Sign In</button>
+            <button className="text-sm text-center text-white px-2 py-1 rounded bg-neutral-950 transition-colors hover:bg-neutral-800">
+              <Link href="/signup">Sign Up</Link>
+            </button>
+            <button className="text-sm text-center text-white px-2 py-1 rounded bg-neutral-950 transition-colors hover:bg-neutral-800">
+              <Link href="/login">Log In</Link>
+            </button>
           </nav>
         </div>
         <div className="text-xl font-[family-name:var(--font-geist-mono)]">
